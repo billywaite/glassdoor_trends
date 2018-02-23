@@ -46,8 +46,21 @@ def scrape_glass_chart(base_url, company):
 			   if na_test != 'N/A':
 				   
 			      actions.click().perform()
-			      time.sleep(0.5)
-	  		      chart_number = driver.find_element_by_id('DesktopTrendChart').get_attribute('data-highcharts-chart')
+	  		      
+                             # Instruct this to wait until active chart updates
+                              while True:
+                                if rating not in ['Recommend', 'CeoRating', 'BizOutlook']:
+                                        update_check = driver.find_element_by_class_name('ui-accordion-header-active').find_element_by_css_selector('label').text
+                                        if update_check == 'Comp & Benefits': 
+                                                update_check = 'Compensation and Benefits'
+                                else:
+                                        update_check = driver.find_element_by_class_name('active').find_element_by_css_selector('span').text
+        
+                                label_check = driver.find_element_by_id('DesktopCharts').find_element_by_css_selector('label').text
+                                if update_check.lower() in label_check.lower():
+                                   break 
+
+			      chart_number = driver.find_element_by_id('DesktopTrendChart').get_attribute('data-highcharts-chart')
 			      chart_data = driver.execute_script('return Highcharts.charts[' + chart_number + '].series[0].options.data')
 	
 			      # Lists for dismembering the scraped data structure
